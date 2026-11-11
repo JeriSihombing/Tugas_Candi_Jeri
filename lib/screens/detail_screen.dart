@@ -1,200 +1,176 @@
 import 'package:flutter/material.dart';
-import 'package:wisata_candi/models/candi.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class DetailScreen extends StatelessWidget {
-  final Candi candi;
-
-  const DetailScreen({super.key, required this.candi});
+  const DetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
-          children: [
-            Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      candi.imageAsset,
-                      width: double.infinity,
-                      height: 300,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.deepPurple[100]?.withValues(alpha: 0.8),
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.arrow_back),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        candi.name,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.favorite_border),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      const Icon(Icons.place, color: Colors.red),
-                      const SizedBox(width: 8),
-                      const SizedBox(
-                        width: 70,
-                        child: Text(
-                          'Lokasi',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Text(': ${candi.location}'),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Icon(Icons.calendar_month, color: Colors.blue),
-                      const SizedBox(width: 8),
-                      const SizedBox(
-                        width: 70,
-                        child: Text(
-                          'Dibangun',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Text(': ${candi.built}'),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Icon(Icons.house, color: Colors.green),
-                      const SizedBox(width: 8),
-                      const SizedBox(
-                        width: 70,
-                        child: Text(
-                          'Tipe',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Text(': ${candi.type}'),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Divider(color: Colors.deepPurple.shade100),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Deskripsi',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    candi.description,
-                    style: const TextStyle(fontSize: 15),
-                  ),
-                ],
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: const [
+            DetailHeader(),
+            DetailInfo(),
+            DetailGallery(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Sub-Widget 1: Header (Gambar Utama Candi)
+class DetailHeader extends StatelessWidget {
+  const DetailHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // Gambar Utama (Asset Offline + Network Fallback Online)
+        Image.asset(
+          'images/candi_singosari_main.jpg',
+          height: 300,
+          width: double.infinity,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Image.network(
+              'https://images.unsplash.com/photo-1609946850974-958a74e53e41?q=80&w=800',
+              height: 300,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+// Sub-Widget 2: Informasi Detail Candi
+class DetailInfo extends StatelessWidget {
+  const DetailInfo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text(
+                'Candi Singosari',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Divider(color: Colors.deepPurple.shade100),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Galeri',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    height: 100,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: candi.imageUrls.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: GestureDetector(
-                            onTap: () {},
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: Colors.deepPurple.shade100,
-                                  width: 2,
-                                ),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: CachedNetworkImage(
-                                  imageUrl: candi.imageUrls[index],
-                                  width: 120,
-                                  height: 120,
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => Container(
-                                    width: 120,
-                                    height: 120,
-                                    color: Colors.deepPurple[50],
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
-                                ),
-                              ),
-                            ),
-                          ),
+              Icon(Icons.favorite, color: Colors.red),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: const [
+              Icon(Icons.location_on, color: Colors.red, size: 18),
+              SizedBox(width: 8),
+              Text('Lokasi : Malang, Jawa Timur'),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: const [
+              Icon(Icons.calendar_month, color: Colors.blue, size: 18),
+              SizedBox(width: 8),
+              Text('Dibangun : Abad ke-13'),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: const [
+              Icon(Icons.account_balance, color: Colors.green, size: 18),
+              SizedBox(width: 8),
+              Text('Tipe : Candi Hindu-Buddha'),
+            ],
+          ),
+          const Divider(height: 24),
+          const Text(
+            'Deskripsi',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Candi Singasari adalah situs Hindu-Buddha bersejarah dari Kerajaan Singasari, '
+            'terletak di Singosari, Malang, Jawa Timur, Indonesia, sekitar 10 km dari Kota Malang. '
+            'Candi ini merupakan tempat pemujaan Raja Kertanegara, raja terakhir Singasari.',
+            textAlign: TextAlign.justify,
+          ),
+          const Divider(height: 24),
+        ],
+      ),
+    );
+  }
+}
+
+// Sub-Widget 3: Galeri Gambar Horizontal
+class DetailGallery extends StatelessWidget {
+  const DetailGallery({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String> offlineImages = [
+      'images/galeri1.jpg',
+      'images/galeri2.jpg',
+      'images/galeri3.jpg',
+    ];
+
+    final List<String> onlineImages = [
+      'https://picsum.photos/id/1015/200/200',
+      'https://picsum.photos/id/1043/200/200',
+      'https://picsum.photos/id/1047/200/200',
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Galeri',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 100,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: offlineImages.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Image.asset(
+                      offlineImages[index],
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.network(
+                          onlineImages[index],
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
                         );
                       },
                     ),
                   ),
-                  const Text(
-                    'Tap untuk memperbesar',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.black54,
-                    ),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 20),
+        ],
       ),
     );
   }
