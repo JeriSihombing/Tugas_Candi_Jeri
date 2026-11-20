@@ -38,7 +38,9 @@ class DetailScreen extends StatelessWidget {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      icon: const Icon(Icons.arrow_back),
+                      icon: const Icon(
+                        Icons.arrow_back,
+                      ),
                     ),
                   ),
                 ),
